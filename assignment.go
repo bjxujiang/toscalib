@@ -24,16 +24,22 @@ func (p *Assignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	var m map[string]string
 	if err := unmarshal(&m); err == nil {
+		processed := false
 		for k, v := range m {
 			if isFunction(k) {
+				processed = true
 				p.Function = k
 				args := make([]interface{}, 1)
 				args[0] = v
 				p.Args = args
 			}
 			if isOperator(k) {
+				processed = true
 				p.Expression = ConstraintClause{Operator: k, Values: v}
 			}
+		}
+		if !processed {
+			p.Value = m
 		}
 		return nil
 	}
